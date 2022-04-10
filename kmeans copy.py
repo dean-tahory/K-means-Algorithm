@@ -85,38 +85,8 @@ def k_means(K, max_iter, points: list[list[float]]):
 
     centroids = [points[i] for i in range(K)]
 
-    # dict mapping points indexes to centroids indexes
-    points_to_centroids = {i: 0 for i in range(len(points))}
-
-    small_delta = False
-
-    for l in range(max_iter):
-        # iterating points and update their centorid's index
-        # for point_index, centroid_index in points_to_centroids.items():
-        for i in range(len(points_to_centroids)):
-            new_centroid = points_to_centroids[i]
-            for j in range(K):
-                if distance(centroids[j], points[i]) < distance(centroids[new_centroid], points[i]):
-                    new_centroid = j
-            points_to_centroids[i] = new_centroid
-
-        # calculating new centroids
-        for i in range(K):
-            small_delta = True
-            total = [0.0] * len(points[0])
-            counter = 0
-            for j in range(len(points_to_centroids)):
-                if points_to_centroids[j] == i:
-                    total = points_sum(points[j], total)
-                    counter += 1.0
-            if(counter > 0):
-                new_centroid = [total[j]/counter for j in range(len(total))]
-                if (distance(centroids[i], new_centroid) < 0.0001):
-                    small_delta = False
-                centroids[i] = new_centroid
-        if not small_delta:
-            break
     return centroids
+
 
     # fourth step: writing output
 centroids = k_means(K, max_iter, points)
@@ -127,3 +97,10 @@ centroids = [','.join(c) for c in centroids]
 with open('output.txt', 'w') as f:
     for c in centroids:
         f.write(f'{c}\n')
+
+
+v = [-2, 2, -3]
+u = [3, 1, 2]
+
+print(distance(u, v))
+print(points_sum(u, v))

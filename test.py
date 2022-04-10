@@ -1,5 +1,7 @@
 
 import sys
+
+
 output_number = sys.argv[1]
 
 with open('output.txt', 'r') as output:
