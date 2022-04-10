@@ -1,3 +1,4 @@
+from operator import le
 import sys
 import math
 
@@ -88,7 +89,7 @@ def k_means(K, max_iter, points: list[list[float]]):
     # dict mapping points indexes to centroids indexes
     points_to_centroids = {i: 0 for i in range(len(points))}
 
-    small_delta = False
+    diff_small = [True]*len(centroids)
 
     for l in range(max_iter):
         # iterating points and update their centorid's index
@@ -102,7 +103,7 @@ def k_means(K, max_iter, points: list[list[float]]):
 
         # calculating new centroids
         for i in range(K):
-            small_delta = True
+            diff_small[i] = False
             total = [0.0] * len(points[0])
             counter = 0
             for j in range(len(points_to_centroids)):
@@ -111,14 +112,52 @@ def k_means(K, max_iter, points: list[list[float]]):
                     counter += 1.0
             if(counter > 0):
                 new_centroid = [total[j]/counter for j in range(len(total))]
-                if (distance(centroids[i], new_centroid) < 0.0001):
+                if (distance(centroids[i], new_centroid) < 0.001):
+                    diff_small[i] = True
+                centroids[i] = new_centroid
+        if all(diff_small[i] for i in range(len(diff_small))):
+            break
+    return centroids
+
+
+def k_means_v2(K, max_iter, points):
+    centroids = [points[i] for i in range(K)]
+
+    # array where the indexes are points and the entries are centroids indexes
+    points_to_centroids = [0]*len(points)
+
+    small_delta = False
+
+    for l in range(max_iter):
+        # iterating points and update their centorid's index
+        for i in range(len(points)):
+            new_centroid = points_to_centroids[i]
+            for j in range(K):
+                if distance(centroids[j], points[i]) < distance(centroids[new_centroid], points[i]):
+                    new_centroid = j
+            points_to_centroids[i] = new_centroid
+
+        # calculating new centroids
+        for i in range(K):
+            small_delta = True
+            total = [0.0] * len(points[0])
+            counter = 0
+            for j in range(len(points)):
+                if points_to_centroids[j] == i:
+                    total = points_sum(points[j], total)
+                    counter += 1.0
+
+            if(counter > 0):
+                new_centroid = [total[j]/counter for j in range(len(total))]
+                if (distance(centroids[i], new_centroid) < 0.001):
                     small_delta = False
                 centroids[i] = new_centroid
         if not small_delta:
             break
     return centroids
 
-    # fourth step: writing output
+
+# fourth step: writing output
 centroids = k_means(K, max_iter, points)
 for c in centroids:
     for i in range(len(c)):
